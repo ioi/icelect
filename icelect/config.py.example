@@ -1,0 +1,2 @@
+SQLALCHEMY_DATABASE_URI = "postgresql:///icelect"
+SQLALCHEMY_DEBUG = False
