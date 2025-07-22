@@ -1,0 +1,15 @@
+[project]
+name = "icelect"
+description = "IOI Commitee Elections"
+version = "1.0"
+dependencies = [
+	# Please keep sorted
+	'psycopg2',
+	'sqlalchemy ~= 2.0',
+]
+requires-python = ">= 3.11"
+maintainers = [ { name = "Martin Mareš", email = "mj@ucw.cz" } ]
+
+[build-system]
+requires = ["setuptools >= 66.1.1"]
+build-backend = "setuptools.build_meta"
