@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% set title="Election: " + econf.title %}
+
+{% block body %}
+
+<script>
+	function recalc_nonce(force) {
+		const element = document.getElementById('nonce');
+		if (force || !element.value) {
+			const nonce_bin = new Uint8Array(6);
+			window.crypto.getRandomValues(nonce_bin);
+			const nonce_string = Array.from(nonce_bin, (byte) => String.fromCodePoint(byte)).join("");
+			const nonce = btoa(nonce_string);
+			element.value = nonce;
+		}
+	}
+
+	window.addEventListener("load", (event) => { recalc_nonce(false) });
+</script>
+
+<form method="POST">
+{{ vote_form.csrf_token }}
+{{ vote_form.credential }}
+<p>
+	FIXME: Explain how voting works and what is the nonce.
+</p>
+<p>
+	{{ vote_form.nonce.label }}
+	{{ vote_form.nonce(size=16) }}
+	<button type="button" onclick="recalc_nonce(true)">Generate</button>
+</p>
+<table class=vote>
+	<tr>
+		<th>Option
+		{% for choice in vote_rows[0][1] %}
+		<th>{{ choice.label }}
+		{% endfor %}
+	{% for candidate, radio in vote_rows %}
+	<tr>
+		<td>{{ candidate }}
+		{% for choice in radio %}
+		<td>{{ choice }}
+		{% endfor %}
+	{% endfor %}
+</table>
+<p>
+	{{ vote_form.send }}
+</p>
+</form>
+
+{% endblock %}

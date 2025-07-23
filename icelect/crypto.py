@@ -3,6 +3,7 @@
 
 import base64
 import hashlib
+import hmac
 import secrets
 
 
@@ -27,3 +28,17 @@ def h1_to_h2(h1: str) -> str:
 
 def gen_key() -> str:
     return base64.b64encode(secrets.token_bytes(24)).decode('us-ascii')
+
+
+def h1_to_receipt(h1: str, key: str) -> str:
+    return _sign(h1, key)[:8]
+
+
+def h1_to_verifier(h1: str, key: str) -> str:
+    return _sign(h1, key)
+
+
+def _sign(msg: str, key: str) -> str:
+    hkey = hashlib.sha256(key.encode('us-ascii')).digest()   # We need key size == hash function block size.
+    digest = hmac.digest(hkey, msg.encode('us-ascii'), 'sha256')
+    return base64.b64encode(digest[:18]).decode('us-ascii')

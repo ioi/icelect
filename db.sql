@@ -24,8 +24,9 @@ CREATE TABLE cred_hashes (
 
 CREATE TABLE ballots (
 	election_id	int		NOT NULL REFERENCES elections(election_id),
-	-- ranks of individual candidates (only order matters)
 	receipt		text		NOT NULL,
+	nonce		text		NOT NULL,
+	-- ranks of individual candidates (only order matters)
 	ranks		smallint[]	NOT NULL,
 	UNIQUE (election_id, receipt)
 );

@@ -15,6 +15,7 @@ class ElectionConfig:
     ident: str
     title: str
     candidates: list[str]
+    num_candidates: int
     tree: Any
 
     def __init__(self, ident: str, tree: Any):
@@ -39,7 +40,8 @@ class ElectionConfig:
             self.title = root['title'].as_str()
             candidates = root['candidates']
             self.candidates = [val.as_str() for val in candidates.array_values()]
-            if len(self.candidates) < 2:
+            self.num_candidates = len(self.candidates)
+            if self.num_candidates < 2:
                 candidates.raise_error("There must be at least 2 candidates")
             root.assert_no_other_keys()
         except WalkerError as err:

@@ -11,4 +11,57 @@
 	{% endfor %}
 </ul>
 
+{% if election.state == ElectionState.voting %}
+
+	{% if cred_form %}
+	<p>In order to vote, enter your voting credential and press Vote:</p>
+	<form method="POST" action="{{ url_for('vote', ident=election.ident) }}">
+	{{ cred_form.csrf_token }}
+	{{ cred_form.credential }}
+	{{ cred_form.vote }}
+	</form>
+	{% endif %}
+
+	{% if check_form %}
+	<p>If you have your receipt, you can verify your vote here:</p>
+	<form method="POST" action="{{ url_for('check_vote', ident=election.ident) }}">
+	{{ check_form.csrf_token }}
+	{{ check_form.receipt }}
+	{{ check_form.check }}
+	</form>
+	{% endif %}
+
+{% elif election.state == ElectionState.counting %}
+
+<p>
+	The votes are now being counted.
+</p>
+
+{% elif election.state == ElectionState.results %}
+
+<p>
+	The election is over.
+</p>
+
+<p>
+	You can see <a href='{{ url_for('ballots', ident=election.ident) }}'>all ballots cast</a>.
+</p>
+
+{% endif %}
+
+{% if g.is_admin %}
+<h3>Administration</h3>
+
+<form method="POST" action="{{ url_for('set_state', ident=election.ident) }}">
+{{ set_state_form.csrf_token }}
+{{ set_state_form.new_state.label }}
+{{ set_state_form.new_state }}
+{{ set_state_form.submit }}
+</form>
+{% endif %}
+
+<div class='btn-group mt-4'>
+	<a class='btn btn-primary' href='{{ url_for('index') }}'>Back to the list of elections</a>
+</div>
+
 {% endblock %}

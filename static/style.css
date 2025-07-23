@@ -1,4 +1,3 @@
-/*
 body {
 	display: flex;
 	flex-direction: column;
@@ -8,6 +7,14 @@ body {
 	min-height: 100vh;
 }
 
+header {
+	display: block;
+	margin: 0 auto;
+	padding: 0 1em;
+	max-width: 1000px;
+	width: 100%;
+}
+
 main {
 	display: block;
 	margin: 0 auto;
@@ -15,7 +22,14 @@ main {
 	max-width: 1000px;
 	width: 100%;
 }
-*/
+
+footer {
+	display: block;
+	margin: 0 auto;
+	padding: 2vh 1em 0 1em;
+	max-width: 1000px;
+	width: 100%;
+}
 
 .election-list {
 	border-collapse: collapse;
@@ -24,4 +38,35 @@ main {
 .election-list TD, .election-list TH {
 	border: 1px solid #666666;
 	padding: 0.3ex 1ex;
+}
+
+.vote {
+	border-collapse: collapse;
+}
+
+.vote TD, .vote TH {
+	border: 1px solid #666666;
+	padding: 0.3ex 1ex;
+}
+
+.ballots {
+	border-collapse: collapse;
+}
+
+.ballots TD, .ballots TH {
+	border: 1px solid #666666;
+	padding: 0.3ex 1ex;
+}
+
+.ballots TD:nth-child(1), .ballots TD:nth-child(2) {
+	font-family: monospace;
+}
+
+.ballots TD:nth-child(n+3) {
+	text-align: center;
+}
+
+.ballots TH:nth-child(n+3) {
+	writing-mode: vertical-rl;
+	transform: rotate(180deg);
 }

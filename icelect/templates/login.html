@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% set title="IOI Elections: Login" %}
+
+{% block body %}
+
+<form method="POST">
+{{ form.csrf_token }}
+{{ form.password }}
+{{ form.login }}
+</form>
+
+{% endblock %}

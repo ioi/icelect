@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% set title="Ballots cast: " + econf.title %}
+
+{% block body %}
+
+<table class=ballots>
+	<tr>
+		<th>Receipt
+		<th>Nonce
+		{% for candidate in econf.candidates %}
+		<th>{{ candidate }}
+		{% endfor %}
+	{% for ballot in ballots %}
+	<tr>
+		<td>{{ ballot.receipt }}
+		<td>{{ ballot.nonce }}
+		{% for rank in ballot.ranks %}
+		<td>{{ rank }}
+		{% endfor %}
+	{% endfor %}
+</table>
+
+<div class='btn-group mt-4'>
+	<a class='btn btn-primary' href='{{ url_for('election', ident=election.ident) }}'>Back to the election</a>
+</div>
+
+{% endblock %}

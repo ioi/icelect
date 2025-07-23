@@ -19,7 +19,28 @@ class Base(DeclarativeBase):
     }
 
 
-class ElectionState(StrEnum):
+class MyEnum(StrEnum):
+    @classmethod
+    def choices(cls) -> list[tuple[str, str]]:
+        out = []
+        for item in cls:
+            out.append((item.name, item.friendly_name()))
+        return out
+
+    def friendly_name(self) -> str:
+        return str(self)
+
+    @classmethod
+    def coerce(cls, name):
+        if isinstance(name, cls):
+            return name
+        try:
+            return cls[name]
+        except KeyError:
+            raise ValueError(name)
+
+
+class ElectionState(MyEnum):
     init = auto()
     voting = auto()
     counting = auto()
@@ -56,7 +77,8 @@ class Ballot(Base):
 
     election_id: Mapped[ElectionId] = col(ForeignKey('elections.election_id'), primary_key=True)
     receipt: Mapped[str] = col(primary_key=True)
-    ranks: Mapped[list[int]] = col(ARRAY(int))
+    nonce: Mapped[str]
+    ranks: Mapped[list[int]] = col(ARRAY(t.Integer))
 
     election: Mapped[Election] = relationship()
 

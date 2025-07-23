@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% set title="Election: " + econf.title %}
+
+{% block body %}
+
+{% if ballot %}
+
+<h2>Your ballot</h2>
+
+<p>
+	Receipt: <code>{{ receipt }}</code>
+</p>
+
+<p>
+	Nonce: <code>{{ ballot.nonce }}</code>
+</p>
+
+<p>
+	Ranks of candidates (lowest rank preferred):
+</p>
+
+<table class=vote>
+	{% for candidate, rank in candidate_ranks %}
+	<tr>
+		<td>{{ candidate }}
+		<td>{{ rank }}
+	{% endfor %}
+</table>
+
+{% else %}
+
+<p>
+	No ballot with receipt <code>{{ receipt }}</code> was found.
+</p>
+
+{% endif %}
+
+<div class='btn-group mt-4'>
+	<a class='btn btn-primary' href='{{ url_for('election', ident=election.ident) }}'>Back to the election</a>
+</div>
+
+{% endblock %}

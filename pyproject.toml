@@ -6,7 +6,7 @@ dependencies = [
 	# Please keep sorted
 	'Flask',
 	'Flask-WTF',
-	'bootstrap-flask',	# a fork of flask_bootstrap
+	'WTForms',
 	'flask_sqlalchemy',
 	'psycopg2',
 	'sqlalchemy ~= 2.0',
