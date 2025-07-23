@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+# Icelect - Registrar script
+# (c) 2025 Martin Mareš <mj@ucw.cz>
+
+import argparse
+import re
+import sys
+
+from icelect.crypto import gen_credential, cred_to_h1, h1_to_h2, h1_to_verifier
+
+
+def cmd_cred(args: argparse.Namespace) -> None:
+    creds = [gen_credential() for _ in range(args.count)]
+    assert len(creds) == len(set(creds))
+
+    with open(args.output + '.cred', 'w') as out_cred:
+        with open(args.output + '.h1', 'w') as out_h1:
+            with open(args.output + '.h2', 'w') as out_h2:
+                for cred in creds:
+                    print(cred, file=out_cred)
+                    h1 = cred_to_h1(cred)
+                    h2 = h1_to_h2(h1)
+                    print(h1, file=out_h1)
+                    print(h2, file=out_h2)
+
+
+def cmd_verify(args: argparse.Namespace) -> None:
+    with open(args.name + '.h1') as f:
+        h1_list = []
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                h1_list.append(line)
+
+    with open(args.name + '.verify') as f:
+        verifiers = set()
+        verify_key = None
+        for line in f:
+            line = line.strip()
+            if (m := re.fullmatch('# Verification key: (.*)', line)) is not None:
+                assert verify_key is None
+                verify_key = m[1]
+            elif line and not line.startswith('#'):
+                verifiers.add(line)
+        assert verify_key is not None
+
+    allowed_verifiers = set()
+    for h1 in h1_list:
+        allowed_verifiers.add(h1_to_verifier(h1, verify_key))
+
+    count_ok = 0
+    count_bad = 0
+
+    for ver in sorted(verifiers):
+        if ver in allowed_verifiers:
+            count_ok += 1
+        else:
+            count_bad += 1
+            print(f'Verifier {ver} does not correspond to a valid credential.', file=sys.stderr)
+
+    print(f'Found {count_ok} correct verifiers (out of {len(allowed_verifiers)} registered voters) and {count_bad} bad ones.')
+
+    if count_bad > 0:
+        sys.exit(1)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Tools for election registrars",
+    )
+
+    subparsers = parser.add_subparsers(help='action to perform', dest='action', required=True, metavar='ACTION')
+
+    cred_parser = subparsers.add_parser('cred',
+                                        help='generate voter credentials',
+                                        description="""
+        Generate voter credentials.
+        Produces: OUTPUT.cred (credentials to distribute to the voters and then discard),
+        OUTPUT.h1 (credential hashes to keep), and
+        OUTPUT.h2 (credential hashes to upload to the election server).
+    """)
+    cred_parser.add_argument('--count', '-c', type=int, required=True, help="number of voters")
+    cred_parser.add_argument('--output', '-o', required=True, help="base name of generated files")
+    cred_parser.set_defaults(handler=cmd_cred)
+
+    verify_parser = subparsers.add_parser('verify',
+                                          help='verify votes cast',
+                                          description="""
+        Checks that verifiers downloaded from the election system as NAME.verify
+        match hashes of legitimate voter credentials in NAME.h1.
+    """)
+    verify_parser.add_argument('--name', '-n', required=True, help="base name of election files")
+    verify_parser.set_defaults(handler=cmd_verify)
+
+    args = parser.parse_args()
+    args.handler(args)
+
+
+if __name__ == '__main__':
+    main()
