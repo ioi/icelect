@@ -282,6 +282,31 @@ class BallotsPage(IcelectView):
         )
 
 
+class VerifierDownload(IcelectView):
+    def dispatch_request(self, ident: str):
+        self.init_election(ident)
+
+        if self.election.state not in (db.ElectionState.counting, db.ElectionState.results) or not (g.is_admin or g.is_reg):
+            raise werkzeug.exceptions.Forbidden("Not available to you")
+
+        sess = db.get_session()
+        verifiers = list(sess.scalars(
+            select(db.Verifier.verifier)
+            .filter_by(election=self.election)
+            .order_by(db.Verifier.verifier)
+        ))
+
+        out = [
+            f'# Election: {ident}',
+            f'# Verification key: {self.election.verify_key}',
+        ] + verifiers + []
+
+        return Response(
+            response="\n".join(out),
+            mimetype='text/plain; charset=utf-8',
+        )
+
+
 class LoginForm(FlaskForm):
     password = wtforms.PasswordField()
     login = wtforms.SubmitField("Log in")
@@ -325,4 +350,5 @@ app.add_url_rule('/e/<ident>/', view_func=ElectionPage.as_view('election'))
 app.add_url_rule('/e/<ident>/vote', view_func=VotePage.as_view('vote'))
 app.add_url_rule('/e/<ident>/check', view_func=CheckVotePage.as_view('check_vote'))
 app.add_url_rule('/e/<ident>/ballots', view_func=BallotsPage.as_view('ballots'))
+app.add_url_rule('/e/<ident>/verifiers.txt', view_func=VerifierDownload.as_view('verifiers'))
 app.add_url_rule('/e/<ident>/admin/set-state', view_func=SetElectionState.as_view('set_state'))

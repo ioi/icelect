@@ -3,7 +3,7 @@
 
 {% block body %}
 
-<p>Candidates:
+<p>Options:
 
 <ul>
 	{% for c in econf.candidates %}
@@ -46,6 +46,17 @@
 <p>
 	You can see <a href='{{ url_for('ballots', ident=election.ident) }}'>all ballots cast</a>.
 </p>
+
+{% endif %}
+
+{% if g.is_reg or g.is_admin %}
+
+	{% if election.state == ElectionState.counting or election.state == ElectionState.results %}
+	<p>
+		As a registrar, you should download the <a href='{{ url_for('verifiers', ident=election.ident) }}'>verifiers</a>
+		and check that only registered votes have voted.
+	</p>
+	{% endif %}
 
 {% endif %}
 
