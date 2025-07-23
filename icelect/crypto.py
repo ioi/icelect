@@ -23,3 +23,7 @@ def h1_to_h2(h1: str) -> str:
     h2bin = hashlib.sha256(h1.encode('us-ascii')).digest()
     h2 = base64.b64encode(h2bin[:18]).decode('us-ascii')
     return h2
+
+
+def gen_key() -> str:
+    return base64.b64encode(secrets.token_bytes(24)).decode('us-ascii')

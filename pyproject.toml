@@ -4,6 +4,10 @@ description = "IOI Commitee Elections"
 version = "1.0"
 dependencies = [
 	# Please keep sorted
+	'Flask',
+	'Flask-WTF',
+	'bootstrap-flask',	# a fork of flask_bootstrap
+	'flask_sqlalchemy',
 	'psycopg2',
 	'sqlalchemy ~= 2.0',
 ]

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% set title="Election: " + econf.title %}
+
+{% block body %}
+
+<p>Candidates:
+
+<ul>
+	{% for c in econf.candidates %}
+	<li>{{ c }}
+	{% endfor %}
+</ul>
+
+{% endblock %}

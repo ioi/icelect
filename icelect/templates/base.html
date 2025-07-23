@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ title }}</title>
+        <link rel=stylesheet href="{{ url_for('static', filename='style.css') }}" type='text/css' media=all>
+	{% if False %}
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-16x16.png') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+	{% endif %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block head %}{% endblock %}
+</head>
+<body>
+<h1>{{ title }}</h1>
+
+{% if g.is_admin %}
+<h3>Admin mode</h3>
+{% endif %}
+
+{% block body %}{% endblock %}
+</body>
+</html>

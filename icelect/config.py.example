@@ -1,2 +1,13 @@
 SQLALCHEMY_DATABASE_URI = "postgresql:///icelect"
 SQLALCHEMY_DEBUG = False
+SQLALCHEMY_ECHO = False
+SQLALCHEMY_ENGINE_OPTIONS = {
+    # SQLAlchemy does not check if the connection is still open at the
+    # beginning of a transaction. The work-around is to ask it to pre-ping
+    # the database.
+    "pool_pre_ping": True,
+}
+
+SECRET_KEY = "abracadabraca"
+SESSION_COOKIE_PATH = '/'
+SESSION_COOKIE_NAME = 'icelect_session'

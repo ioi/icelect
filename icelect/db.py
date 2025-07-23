@@ -18,6 +18,7 @@ class Base(DeclarativeBase):
         ElectionId: t.Integer,
     }
 
+
 class ElectionState(StrEnum):
     init = auto()
     voting = auto()
@@ -30,15 +31,15 @@ class Election(Base):
 
     election_id: Mapped[ElectionId] = col(primary_key=True)
     ident: Mapped[str]
-    name: Mapped[str]
     state: Mapped[ElectionState]
     config: Mapped[Any] = col(JSONB)
     election_key: Mapped[str]
     verify_key: Mapped[str]
+    order: Mapped[int] = col(default=0)
 
-    cred_hashes: Mapped['CredHash'] = relationship()
-    ballots: Mapped['Ballot'] = relationship()
-    verifiers: Mapped['Verifier'] = relationship()
+    cred_hashes: Mapped['CredHash'] = relationship(back_populates='election')
+    ballots: Mapped['Ballot'] = relationship(back_populates='election')
+    verifiers: Mapped['Verifier'] = relationship(back_populates='election')
 
 
 class CredHash(Base):
@@ -70,19 +71,24 @@ class Verifier(Base):
 
 
 current_session: Optional[Session] = None
+flask_db: Any = None
 
 
 def get_session() -> Session:
     global current_session
     if current_session is None:
-        current_session = new_session()
+        if flask_db is not None:
+            current_session = flask_db.session
+        else:
+            current_session = new_session()
     return current_session
 
 
 def new_session() -> Session:
     engine = create_engine(
         config.SQLALCHEMY_DATABASE_URI,
-        echo=config.SQLALCHEMY_DEBUG,
+        echo=config.SQLALCHEMY_ECHO,
+        isolation_level='SERIALIZABLE',
     )
 
     sqla_logger = logging.getLogger('sqlalchemy.engine.base.Engine')

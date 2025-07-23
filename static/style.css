@@ -1,0 +1,27 @@
+/*
+body {
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+	color: black;
+	margin: 0;
+	min-height: 100vh;
+}
+
+main {
+	display: block;
+	margin: 0 auto;
+	padding: 0 1em;
+	max-width: 1000px;
+	width: 100%;
+}
+*/
+
+.election-list {
+	border-collapse: collapse;
+}
+
+.election-list TD, .election-list TH {
+	border: 1px solid #666666;
+	padding: 0.3ex 1ex;
+}
