@@ -44,7 +44,8 @@
 </p>
 
 <p>
-	You can see <a href='{{ url_for('ballots', ident=election.ident) }}'>all ballots cast</a>.
+	You can see <a href='{{ url_for('ballots', ident=election.ident) }}'>all ballots cast</a> or download them as
+	<a href='{{ url_for('ballots_csv', ident=election.ident) }}'>CSV</a>.
 </p>
 
 {% endif %}

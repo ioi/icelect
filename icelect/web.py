@@ -1,12 +1,14 @@
 # Icelect - The web application
 # (c) 2025 Martin Mareš <mj@ucw.cz>
 
+import csv
 from flask import Flask, request, session, redirect, url_for, render_template, Response, g
 from flask.helpers import flash
 import flask.logging
 from flask.views import View
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
+from io import StringIO
 import os
 from sqlalchemy import select, func
 from sqlalchemy.dialects.postgresql import insert
@@ -275,11 +277,23 @@ class BallotsPage(IcelectView):
             .order_by(db.Ballot.receipt)
         )
 
-        return render_template(
-            'ballots.html',
-            election=self.election, econf=self.econf,
-            ballots=ballots,
-        )
+        if request.endpoint == 'ballots_csv':
+            file = StringIO()
+            csw = csv.writer(file)
+            csw.writerow(['receipt', 'nonce'] + self.econf.candidates)
+            for ballot in ballots:
+                csw.writerow([ballot.receipt, ballot.nonce] + ballot.ranks)
+
+            return Response(
+                response=file.getvalue(),
+                mimetype='text/csv; charset=utf-8',
+            )
+        else:
+            return render_template(
+                'ballots.html',
+                election=self.election, econf=self.econf,
+                ballots=ballots,
+            )
 
 
 class VerifierDownload(IcelectView):
@@ -350,5 +364,6 @@ app.add_url_rule('/e/<ident>/', view_func=ElectionPage.as_view('election'))
 app.add_url_rule('/e/<ident>/vote', view_func=VotePage.as_view('vote'))
 app.add_url_rule('/e/<ident>/check', view_func=CheckVotePage.as_view('check_vote'))
 app.add_url_rule('/e/<ident>/ballots', view_func=BallotsPage.as_view('ballots'))
+app.add_url_rule('/e/<ident>/ballots.csv', view_func=BallotsPage.as_view('ballots_csv'))
 app.add_url_rule('/e/<ident>/verifiers.txt', view_func=VerifierDownload.as_view('verifiers'))
 app.add_url_rule('/e/<ident>/admin/set-state', view_func=SetElectionState.as_view('set_state'))
