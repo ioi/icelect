@@ -8,6 +8,7 @@ dependencies = [
 	'Flask-WTF',
 	'WTForms',
 	'flask_sqlalchemy',
+	'numpy',
 	'psycopg2',
 	'sqlalchemy ~= 2.0',
 ]

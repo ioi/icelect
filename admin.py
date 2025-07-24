@@ -3,6 +3,7 @@
 # (c) 2025 Martin Mareš <mj@ucw.cz>
 
 import argparse
+import csv
 from sqlalchemy import select, func
 from sqlalchemy.dialects.postgresql import insert
 import sys
@@ -11,6 +12,7 @@ from typing import NoReturn
 from icelect.crypto import gen_key
 import icelect.db as db
 from icelect.election import ElectionConfig, ConfigError
+from icelect.schulze import Schulze
 
 
 def die(msg: str) -> NoReturn:
@@ -99,6 +101,35 @@ def cmd_register(args: argparse.Namespace):
     print(f'Processed {len(hashes)} hashes. Registered voters: {count_before} before, {count_after} after.')
 
 
+def cmd_schulze(args: argparse.Namespace):
+    candidates, ranks = read_csv_ballots(args.input)
+
+    print(candidates)
+    print(ranks)
+
+    schulze = Schulze(len(candidates), ranks)
+
+    print(schulze.beats)
+    print(schulze.weights)
+    print(schulze.strengths)
+
+
+def read_csv_ballots(filename: str) -> tuple[list[str], list[list[int]]]:
+    with open(filename) as f:
+        csr = csv.reader(f)
+        header = next(csr)
+        assert len(header) > 3
+        assert header[0] == 'receipt'
+        assert header[1] == 'nonce'
+        candidates = header[2:]
+
+        ranks = []
+        for row in csr:
+            assert len(row) == len(header)
+            ranks.append([int(r) for r in row[2:]])
+
+    return candidates, ranks
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -124,6 +155,12 @@ def main() -> None:
                                             description='Register voters to an election according to etc/IDENT.h2')
     register_parser.add_argument('ident', help='alphanumeric identifier of the election')
     register_parser.set_defaults(handler=cmd_register)
+
+    schulze_parser = subparsers.add_parser('test_schulze',
+                                            help='test implementation of Schulze method',
+                                            description='Given a list of ballots, compute election outcome using the Schulze method')
+    schulze_parser.add_argument('input', help='CSV file with a list of ballots')
+    schulze_parser.set_defaults(handler=cmd_schulze)
 
     args = parser.parse_args()
     args.handler(args)
