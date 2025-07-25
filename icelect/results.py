@@ -11,6 +11,8 @@
 # https://electowiki.org/wiki/Schulze_method
 
 import numpy as np
+from typing import Any
+
 
 class Results:
 
@@ -96,3 +98,7 @@ class Results:
         print('Path strengths:', self.strengths)
         print('Stronger than relation:', self.stronger)
         print('Schulze order:', self.schulze_order)
+
+    def to_json(self) -> Any:
+        return {
+        }

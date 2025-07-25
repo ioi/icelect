@@ -61,6 +61,7 @@ class Election(Base):
     cred_hashes: Mapped['CredHash'] = relationship(back_populates='election')
     ballots: Mapped['Ballot'] = relationship(back_populates='election')
     verifiers: Mapped['Verifier'] = relationship(back_populates='election')
+    results: Mapped['Result'] = relationship(back_populates='election')
 
 
 class CredHash(Base):
@@ -88,6 +89,15 @@ class Verifier(Base):
 
     election_id: Mapped[ElectionId] = col(ForeignKey('elections.election_id'), primary_key=True)
     verifier: Mapped[str] = col(primary_key=True)
+
+    election: Mapped[Election] = relationship()
+
+
+class Result(Base):
+    __tablename__ = 'results'
+
+    election_id: Mapped[ElectionId] = col(ForeignKey('elections.election_id'), primary_key=True)
+    result: Mapped[Any] = col(JSONB)
 
     election: Mapped[Election] = relationship()
 

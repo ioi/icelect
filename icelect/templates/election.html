@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% set title="Election: " + econf.title %}
+{% set title="Election: " + edata.title %}
 
 {% block body %}
 
 <p>Options:
 
 <ul>
-	{% for c in econf.options %}
+	{% for c in edata.options %}
 	<li>{{ c }}
 	{% endfor %}
 </ul>

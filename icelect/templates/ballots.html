@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set title="Ballots cast: " + econf.title %}
+{% set title="Ballots cast: " + edata.title %}
 
 {% block body %}
 
@@ -7,7 +7,7 @@
 	<tr>
 		<th>Receipt
 		<th>Nonce
-		{% for option in econf.options %}
+		{% for option in edata.options %}
 		<th>{{ option }}
 		{% endfor %}
 	{% for ballot in ballots %}

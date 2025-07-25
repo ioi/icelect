@@ -9,9 +9,8 @@ from sqlalchemy.dialects.postgresql import insert
 import sys
 from typing import NoReturn
 
-from icelect.crypto import gen_key
 import icelect.db as db
-from icelect.election import ElectionConfig, ConfigError
+from icelect.election import ElectionData, ConfigError
 from icelect.results import Results
 
 
@@ -24,7 +23,7 @@ def cmd_create(args: argparse.Namespace):
     sess = db.get_session()
 
     try:
-        ec = ElectionConfig.from_config_file(args.ident)
+        ed = ElectionData.from_config_file(args.ident)
     except ConfigError as err:
         die(f'Cannot load configuration for election {args.ident}: {err}')
 
@@ -35,9 +34,9 @@ def cmd_create(args: argparse.Namespace):
     elect = db.Election(
         ident=args.ident,
         state=db.ElectionState.init,
-        config=ec.tree,
-        election_key=gen_key(),
-        verify_key=gen_key(),
+        config=ed.config,
+        election_key=ed.election_key,
+        verify_key=ed.verify_key,
     )
     sess.add(elect)
     sess.commit()
@@ -47,7 +46,7 @@ def cmd_update(args: argparse.Namespace):
     sess = db.get_session()
 
     try:
-        ec = ElectionConfig.from_config_file(args.ident)
+        ed = ElectionData.from_config_file(args.ident)
     except ConfigError as err:
         die(f'Cannot load configuration for election {args.ident}: {err}')
 
@@ -58,19 +57,19 @@ def cmd_update(args: argparse.Namespace):
     if elect.state != db.ElectionState.init:
         die(f'Election {args.ident} is already running, cannot change its configuration.')
 
-    elect.config=ec.tree
+    elect.config = ed.config
     sess.commit()
 
 
-def obtain_election(ident: str) -> tuple[db.Election, ElectionConfig]:
+def obtain_election(ident: str) -> tuple[db.Election, ElectionData]:
     sess = db.get_session()
     elect = sess.scalar(select(db.Election).filter_by(ident=ident))
     if elect is None:
         die(f'Election {ident} does not exist.')
 
-    ec = ElectionConfig(ident, elect.config)
+    ed = ElectionData.from_db(elect)
 
-    return elect, ec
+    return elect, ed
 
 
 def cmd_register(args: argparse.Namespace):
@@ -101,32 +100,33 @@ def cmd_register(args: argparse.Namespace):
     print(f'Processed {len(hashes)} hashes. Registered voters: {count_before} before, {count_after} after.')
 
 
-def cmd_results(args: argparse.Namespace):
-    options, ranks = read_csv_ballots(args.input)
+def cmd_test_results(args: argparse.Namespace):
+    ed = ElectionData.from_csv_ballots(args.input)
+    res = ed.results()
 
-    res = Results(len(options), ranks)
     res.debug()
 
     print('Order of options:')
     for layer in res.schulze_order:
-        print([options[w] for w in layer])
+        print([ed.options[w] for w in layer])
 
 
-def read_csv_ballots(filename: str) -> tuple[list[str], list[list[int]]]:
-    with open(filename) as f:
-        csr = csv.reader(f)
-        header = next(csr)
-        assert len(header) > 3
-        assert header[0] == 'receipt'
-        assert header[1] == 'nonce'
-        options = header[2:]
+def cmd_results(args: argparse.Namespace):
+    elect, ed = obtain_election(args.ident)
 
-        ranks = []
-        for row in csr:
-            assert len(row) == len(header)
-            ranks.append([int(r) for r in row[2:]])
+    ed.ballots_from_db(elect)
+    res = ed.results()
+    res.debug()
+    json = res.to_json()
 
-    return options, ranks
+    sess = db.get_session()
+    dbres = sess.scalar(select(db.Result).filter_by(election=elect))
+    if dbres is None:
+        dbres = db.Result(election=elect, result=json)
+        sess.add(dbres)
+    else:
+        dbres.result = json
+    sess.commit()
 
 
 def main() -> None:
@@ -154,11 +154,17 @@ def main() -> None:
     register_parser.add_argument('ident', help='alphanumeric identifier of the election')
     register_parser.set_defaults(handler=cmd_register)
 
-    results_parser = subparsers.add_parser('test-results',
+    results_parser = subparsers.add_parser('results',
+                                            help='compute results',
+                                            description='Compute election outcome using the Schulze method and store it in the database')
+    results_parser.add_argument('ident', help='alphanumeric identifier of the election')
+    results_parser.set_defaults(handler=cmd_results)
+
+    test_results_parser = subparsers.add_parser('test-results',
                                             help='test computation of results',
                                             description='Given a list of ballots, compute election outcome using the Schulze method')
-    results_parser.add_argument('input', help='CSV file with a list of ballots')
-    results_parser.set_defaults(handler=cmd_results)
+    test_results_parser.add_argument('input', help='CSV file with a list of ballots')
+    test_results_parser.set_defaults(handler=cmd_test_results)
 
     args = parser.parse_args()
     args.handler(args)

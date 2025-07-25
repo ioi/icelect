@@ -19,7 +19,7 @@ import wtforms.validators as validators
 import icelect.config as config
 from icelect.crypto import cred_to_h1, cred_to_h2, h1_to_receipt, h1_to_verifier
 import icelect.db as db
-from icelect.election import ElectionConfig
+from icelect.election import ElectionData
 
 
 static_dir = os.path.abspath('static')
@@ -49,7 +49,7 @@ app.before_request(init_request)
 
 class IcelectView(View):
     election: db.Election
-    econf: ElectionConfig
+    edata: ElectionData
 
     def init_election(self, ident: str, admin_only: bool = False) -> None:
         sess = db.get_session()
@@ -64,7 +64,7 @@ class IcelectView(View):
         if admin_only and not g.is_admin:
             raise werkzeug.exceptions.Forbidden("Available only to administrators")
 
-        self.econf = ElectionConfig(ident, self.election.config)
+        self.edata = ElectionData.from_db(election)
 
     def is_valid_credential(self, cred: str | None) -> bool:
         if cred is None:
@@ -122,7 +122,7 @@ class ElectionPage(IcelectView):
 
         return render_template(
             'election.html',
-            election=self.election, econf=self.econf,
+            election=self.election, edata=self.edata,
             cred_form=cred_form,
             check_form=check_form,
             set_state_form=set_state_form,
@@ -148,8 +148,8 @@ class VotePage(IcelectView):
         class VoteForm(VoteFormBase):
             pass
 
-        choices = [(str(i), str(i)) for i in range(1, self.econf.num_options + 1)]
-        for i in range(self.econf.num_options):
+        choices = [(str(i), str(i)) for i in range(1, self.edata.num_options + 1)]
+        for i in range(self.edata.num_options):
             setattr(VoteForm, f'rank_{i}', wtforms.RadioField(choices=choices, coerce=int))
 
         cred_form = CredentialForm()
@@ -160,8 +160,8 @@ class VotePage(IcelectView):
             if not self.is_valid_credential(cred):
                 flash('This credential is not valid for this election.', 'danger')
                 return redirect(self.election_url())
-            for i in range(self.econf.num_options):
-                getattr(vote_form, f'rank_{i}').data = self.econf.num_options
+            for i in range(self.edata.num_options):
+                getattr(vote_form, f'rank_{i}').data = self.edata.num_options
         elif vote_form.validate_on_submit() and vote_form.send.data:
             cred = vote_form.credential.data or ""
             if not self.is_valid_credential(cred):
@@ -169,10 +169,10 @@ class VotePage(IcelectView):
                 return redirect(self.election_url())
 
             ranks = []
-            for i in range(self.econf.num_options):
+            for i in range(self.edata.num_options):
                 val = getattr(vote_form, f'rank_{i}').data
                 if val is None:
-                    val = self.econf.num_options - 1
+                    val = self.edata.num_options - 1
                 ranks.append(val)
 
             nonce = vote_form.nonce.data or ""
@@ -183,9 +183,9 @@ class VotePage(IcelectView):
 
         return render_template(
             'vote.html',
-            election=self.election, econf=self.econf,
+            election=self.election, edata=self.edata,
             vote_form=vote_form,
-            vote_rows=[(self.econf.options[i], getattr(vote_form, f'rank_{i}')) for i in range(self.econf.num_options)],
+            vote_rows=[(self.edata.options[i], getattr(vote_form, f'rank_{i}')) for i in range(self.edata.num_options)],
         )
 
     def record_vote(self, cred: str, nonce: str, ranks: list[int]) -> str:
@@ -240,10 +240,10 @@ class CheckVotePage(IcelectView):
 
         return render_template(
             'check-vote.html',
-            election=self.election, econf=self.econf,
+            election=self.election, edata=self.edata,
             receipt=form.receipt.data,
             ballot=ballot,
-            option_ranks=zip(self.econf.options, ballot.ranks) if ballot else [],
+            option_ranks=zip(self.edata.options, ballot.ranks) if ballot else [],
         )
 
 
@@ -258,6 +258,7 @@ class SetElectionState(IcelectView):
             app.logger.info('Setting state of election {ident} to {form.new_state.data}')
             self.election.state = form.new_state.data
             db.get_session().commit()
+            flash(f'State set to {self.election.state.friendly_name()}.', 'success')
 
         return redirect(self.election_url())
 
@@ -280,7 +281,7 @@ class BallotsPage(IcelectView):
         if request.endpoint == 'ballots_csv':
             file = StringIO()
             csw = csv.writer(file)
-            csw.writerow(['receipt', 'nonce'] + self.econf.options)
+            csw.writerow(['receipt', 'nonce'] + self.edata.options)
             for ballot in ballots:
                 csw.writerow([ballot.receipt, ballot.nonce] + ballot.ranks)
 
@@ -291,7 +292,7 @@ class BallotsPage(IcelectView):
         else:
             return render_template(
                 'ballots.html',
-                election=self.election, econf=self.econf,
+                election=self.election, edata=self.edata,
                 ballots=ballots,
             )
 

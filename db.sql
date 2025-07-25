@@ -36,3 +36,8 @@ CREATE TABLE verifiers (
 	verifier	text		NOT NULL,
 	UNIQUE (election_id, verifier)
 );
+
+CREATE TABLE results (
+	election_id	int		NOT NULL REFERENCES elections(election_id),
+	result		jsonb		NOT NULL
+);
