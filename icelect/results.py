@@ -17,19 +17,19 @@ from typing import Any
 class Results:
 
     num_options: int
-    ranks: list[list[int]]
+    ballots: list[list[int]]    # each ballot is a list of ranks
 
     beats: np.ndarray
     condorcet_winner: int | None
-    weak_condrocet_winners: list[int]
+    weak_condorcet_winners: list[int]
     weights: np.ndarray
     strengths: np.ndarray
     stronger: np.ndarray
     schulze_order: list[list[int]]
 
-    def __init__(self, num_options: int, ranks: list[list[int]]):
+    def __init__(self, num_options: int, ballots: list[list[int]]):
         self.num_options = num_options
-        self.ranks = ranks
+        self.ballots = ballots
         self.calc_beats()
         self.calc_condorcet()
         self.calc_weights()
@@ -39,7 +39,7 @@ class Results:
     def calc_beats(self):
         self.beats = np.zeros((self.num_options, self.num_options), dtype='i4')
 
-        for rank in self.ranks:
+        for rank in self.ballots:
             assert len(rank) == self.num_options
             for i in range(self.num_options):
                 for j in range(self.num_options):
@@ -88,8 +88,8 @@ class Results:
 
     def debug(self):
         print(f'Number of options: {self.num_options}')
-        print('Ranks:')
-        for r in self.ranks:
+        print('Ballots:')
+        for r in self.ballots:
             print(f'\t{r}')
         print('Beats:', self.beats)
         print('Condorcet winner:', self.condorcet_winner)
@@ -100,5 +100,17 @@ class Results:
         print('Schulze order:', self.schulze_order)
 
     def to_json(self) -> Any:
+        def jsonify_matrix(mat: np.ndarray) -> list[list[int]]:
+            return [
+                [int(mat[i,j]) for j in range(self.num_options)]
+                for i in range(self.num_options)
+            ]
+
         return {
+            'beats': jsonify_matrix(self.beats),
+            'condorcet_winner': self.condorcet_winner,
+            'weak_condorcet_winners': self.weak_condorcet_winners,
+            'weights': jsonify_matrix(self.weights),
+            'strengths': jsonify_matrix(self.strengths),
+            'schulze_order': self.schulze_order,
         }
