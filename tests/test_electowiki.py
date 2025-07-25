@@ -12,7 +12,7 @@ class SchulzeTests(unittest.TestCase):
 
     def schulze_winners(self, votes: list[tuple[int, str]], expected_order: list[str]) -> None:
         n = len(votes[0][1])
-        candidates = [chr(ord('A') + i) for i in range(n)]
+        options = [chr(ord('A') + i) for i in range(n)]
 
         ranks = []
         for count, perm in votes:
@@ -27,7 +27,7 @@ class SchulzeTests(unittest.TestCase):
         res = Results(n, ranks)
         res.debug()
 
-        order = [set(candidates[w] for w in layer) for layer in res.schulze_order]
+        order = [set(options[w] for w in layer) for layer in res.schulze_order]
         self.assertEqual(order, [set(layer) for layer in expected_order])
 
 

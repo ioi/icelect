@@ -35,9 +35,9 @@
 		{% for choice in vote_rows[0][1] %}
 		<th>{{ choice.label }}
 		{% endfor %}
-	{% for candidate, radio in vote_rows %}
+	{% for option, radio in vote_rows %}
 	<tr>
-		<td>{{ candidate }}
+		<td>{{ option }}
 		{% for choice in radio %}
 		<td>{{ choice }}
 		{% endfor %}

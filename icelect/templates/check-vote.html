@@ -16,13 +16,13 @@
 </p>
 
 <p>
-	Ranks of candidates (lowest rank preferred):
+	Ranks of options (lowest rank preferred):
 </p>
 
 <table class=vote>
-	{% for candidate, rank in candidate_ranks %}
+	{% for option, rank in option_ranks %}
 	<tr>
-		<td>{{ candidate }}
+		<td>{{ option }}
 		<td>{{ rank }}
 	{% endfor %}
 </table>

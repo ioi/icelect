@@ -14,7 +14,7 @@ import numpy as np
 
 class Results:
 
-    num_candidates: int
+    num_options: int
     ranks: list[list[int]]
 
     beats: np.ndarray
@@ -25,8 +25,8 @@ class Results:
     stronger: np.ndarray
     schulze_order: list[list[int]]
 
-    def __init__(self, num_candidates: int, ranks: list[list[int]]):
-        self.num_candidates = num_candidates
+    def __init__(self, num_options: int, ranks: list[list[int]]):
+        self.num_options = num_options
         self.ranks = ranks
         self.calc_beats()
         self.calc_condorcet()
@@ -35,22 +35,22 @@ class Results:
         self.calc_winners()
 
     def calc_beats(self):
-        self.beats = np.zeros((self.num_candidates, self.num_candidates), dtype='i4')
+        self.beats = np.zeros((self.num_options, self.num_options), dtype='i4')
 
         for rank in self.ranks:
-            assert len(rank) == self.num_candidates
-            for i in range(self.num_candidates):
-                for j in range(self.num_candidates):
+            assert len(rank) == self.num_options
+            for i in range(self.num_options):
+                for j in range(self.num_options):
                     if i != j and rank[i] < rank[j]:
                         self.beats[i,j] += 1
 
     def calc_condorcet(self):
         self.condorcet_winner = None
         self.weak_condorcet_winners = []
-        for i in range(self.num_candidates):
-            if all(self.beats[i,j] > self.beats[j,i] or i == j for j in range(self.num_candidates)):
+        for i in range(self.num_options):
+            if all(self.beats[i,j] > self.beats[j,i] or i == j for j in range(self.num_options)):
                 self.condorcet_winner = i
-            if all(self.beats[i,j] >= self.beats[j,i] or i == j for j in range(self.num_candidates)):
+            if all(self.beats[i,j] >= self.beats[j,i] or i == j for j in range(self.num_options)):
                 self.weak_condorcet_winners.append(i)
 
     def calc_weights(self):
@@ -60,10 +60,10 @@ class Results:
         self.strengths = self.weights.copy()
         s = self.strengths
 
-        for k in range(self.num_candidates):
-            for i in range(self.num_candidates):
+        for k in range(self.num_options):
+            for i in range(self.num_options):
                 if i != k:
-                    for j in range(self.num_candidates):
+                    for j in range(self.num_options):
                         if i != j and j != k:
                             s[i,j] = max(s[i,j], min(s[i,k], s[k,j]))
 
@@ -71,7 +71,7 @@ class Results:
 
     def calc_winners(self):
         self.schulze_order = []
-        remains = set(range(self.num_candidates))
+        remains = set(range(self.num_options))
 
         while remains:
             layer = remains.copy()
@@ -85,7 +85,7 @@ class Results:
             remains -= layer
 
     def debug(self):
-        print(f'Number of candidates: {self.num_candidates}')
+        print(f'Number of options: {self.num_options}')
         print('Ranks:')
         for r in self.ranks:
             print(f'\t{r}')

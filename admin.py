@@ -102,14 +102,14 @@ def cmd_register(args: argparse.Namespace):
 
 
 def cmd_results(args: argparse.Namespace):
-    candidates, ranks = read_csv_ballots(args.input)
+    options, ranks = read_csv_ballots(args.input)
 
-    res = Results(len(candidates), ranks)
+    res = Results(len(options), ranks)
     res.debug()
 
     print('Order of options:')
     for layer in res.schulze_order:
-        print([candidates[w] for w in layer])
+        print([options[w] for w in layer])
 
 
 def read_csv_ballots(filename: str) -> tuple[list[str], list[list[int]]]:
@@ -119,14 +119,14 @@ def read_csv_ballots(filename: str) -> tuple[list[str], list[list[int]]]:
         assert len(header) > 3
         assert header[0] == 'receipt'
         assert header[1] == 'nonce'
-        candidates = header[2:]
+        options = header[2:]
 
         ranks = []
         for row in csr:
             assert len(row) == len(header)
             ranks.append([int(r) for r in row[2:]])
 
-    return candidates, ranks
+    return options, ranks
 
 
 def main() -> None:

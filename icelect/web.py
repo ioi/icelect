@@ -148,8 +148,8 @@ class VotePage(IcelectView):
         class VoteForm(VoteFormBase):
             pass
 
-        choices = [(str(i), str(i)) for i in range(1, self.econf.num_candidates + 1)]
-        for i in range(self.econf.num_candidates):
+        choices = [(str(i), str(i)) for i in range(1, self.econf.num_options + 1)]
+        for i in range(self.econf.num_options):
             setattr(VoteForm, f'rank_{i}', wtforms.RadioField(choices=choices, coerce=int))
 
         cred_form = CredentialForm()
@@ -160,8 +160,8 @@ class VotePage(IcelectView):
             if not self.is_valid_credential(cred):
                 flash('This credential is not valid for this election.', 'danger')
                 return redirect(self.election_url())
-            for i in range(self.econf.num_candidates):
-                getattr(vote_form, f'rank_{i}').data = self.econf.num_candidates
+            for i in range(self.econf.num_options):
+                getattr(vote_form, f'rank_{i}').data = self.econf.num_options
         elif vote_form.validate_on_submit() and vote_form.send.data:
             cred = vote_form.credential.data or ""
             if not self.is_valid_credential(cred):
@@ -169,10 +169,10 @@ class VotePage(IcelectView):
                 return redirect(self.election_url())
 
             ranks = []
-            for i in range(self.econf.num_candidates):
+            for i in range(self.econf.num_options):
                 val = getattr(vote_form, f'rank_{i}').data
                 if val is None:
-                    val = self.econf.num_candidates - 1
+                    val = self.econf.num_options - 1
                 ranks.append(val)
 
             nonce = vote_form.nonce.data or ""
@@ -185,7 +185,7 @@ class VotePage(IcelectView):
             'vote.html',
             election=self.election, econf=self.econf,
             vote_form=vote_form,
-            vote_rows=[(self.econf.candidates[i], getattr(vote_form, f'rank_{i}')) for i in range(self.econf.num_candidates)],
+            vote_rows=[(self.econf.options[i], getattr(vote_form, f'rank_{i}')) for i in range(self.econf.num_options)],
         )
 
     def record_vote(self, cred: str, nonce: str, ranks: list[int]) -> str:
@@ -243,7 +243,7 @@ class CheckVotePage(IcelectView):
             election=self.election, econf=self.econf,
             receipt=form.receipt.data,
             ballot=ballot,
-            candidate_ranks=zip(self.econf.candidates, ballot.ranks) if ballot else [],
+            option_ranks=zip(self.econf.options, ballot.ranks) if ballot else [],
         )
 
 
@@ -280,7 +280,7 @@ class BallotsPage(IcelectView):
         if request.endpoint == 'ballots_csv':
             file = StringIO()
             csw = csv.writer(file)
-            csw.writerow(['receipt', 'nonce'] + self.econf.candidates)
+            csw.writerow(['receipt', 'nonce'] + self.econf.options)
             for ballot in ballots:
                 csw.writerow([ballot.receipt, ballot.nonce] + ballot.ranks)
 

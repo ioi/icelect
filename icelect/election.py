@@ -14,8 +14,8 @@ class ConfigError(ValueError):
 class ElectionConfig:
     ident: str
     title: str
-    candidates: list[str]
-    num_candidates: int
+    options: list[str]
+    num_options: int
     tree: Any
 
     def __init__(self, ident: str, tree: Any):
@@ -38,11 +38,11 @@ class ElectionConfig:
         try:
             root = Walker(self.tree).enter_object()
             self.title = root['title'].as_str()
-            candidates = root['candidates']
-            self.candidates = [val.as_str() for val in candidates.array_values()]
-            self.num_candidates = len(self.candidates)
-            if self.num_candidates < 2:
-                candidates.raise_error("There must be at least 2 candidates")
+            options = root['options']
+            self.options = [val.as_str() for val in options.array_values()]
+            self.num_options = len(self.options)
+            if self.num_options < 2:
+                options.raise_error("There must be at least 2 options")
             root.assert_no_other_keys()
         except WalkerError as err:
             raise ConfigError(str(err))

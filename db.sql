@@ -26,7 +26,7 @@ CREATE TABLE ballots (
 	election_id	int		NOT NULL REFERENCES elections(election_id),
 	receipt		text		NOT NULL,
 	nonce		text		NOT NULL,
-	-- ranks of individual candidates (only order matters)
+	-- ranks of individual options (only order matters)
 	ranks		smallint[]	NOT NULL,
 	UNIQUE (election_id, receipt)
 );
