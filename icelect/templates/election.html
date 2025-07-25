@@ -43,6 +43,10 @@
 	The election is over.
 </p>
 
+<div class='btn-group'>
+	<a class='btn btn-success' href='{{ url_for('results', ident=election.ident) }}'>Show results</a>
+</div>
+
 <p>
 	You can see <a href='{{ url_for('ballots', ident=election.ident) }}'>all ballots cast</a> or download them as
 	<a href='{{ url_for('ballots_csv', ident=election.ident) }}'>CSV</a>.

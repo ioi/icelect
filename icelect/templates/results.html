@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% set title="Election results: " + edata.title %}
+
+{% block body %}
+
+<h2>Statistics</h2>
+
+<p>There are {{ edata.num_options }} options and {{ num_votes }} votes out of {{ num_voters }} voters.
+
+<h2>Condorcet winner</h2>
+
+{% if condorcet_winner is not none %}
+<p>There is a strong Condorcet winner: <b>{{ condorcet_winner }}</b>.</p>
+{% elif weak_condorcet_winners %}
+<p>There are weak Condorcet winners: <b>{{ weak_condorcet_winners|join(", ") }}.</b></p>
+{% else %}
+<p>There is no Condorcet winner.</p>
+{% endif %}
+
+<h2>Schulze method</h2>
+
+{% if schulze_winners|length == 1 %}
+<p>There is a Schulze winner: <b>{{ schulze_winners[0] }}</b>.</p>
+{% else %}
+<p>There are multiple Schulze winners: <b>{{ schulze_winners|join(", ") }}</b>.
+{% endif %}
+
+<h2>Details</h2>
+
+{% macro matrix(m) %}
+<table>
+	<tr>
+		<th>
+		{% for o in edata.options %}
+		<th>{{ o }}
+		{% endfor %}
+	{% for i in range(edata.num_options) %}
+	<tr>
+		<th>{{ edata.options[i] }}
+		{% for j in range(edata.num_options) %}
+		<td>{{ m[i][j] }}
+		{% endfor %}
+	{% endfor %}
+</table>
+{% endmacro %}
+
+<h3>Beat counts</h3>
+
+{{ matrix(beats) }}
+
+<h3>Beat weights</h3>
+
+{{ matrix(weights) }}
+
+<h3>Path strenghts</h3>
+
+{{ matrix(strengths) }}
+
+<div class='btn-group mt-4'>
+	<a class='btn btn-primary' href='{{ url_for('election', ident=election.ident) }}'>Back to the election</a>
+</div>
+
+{% endblock %}

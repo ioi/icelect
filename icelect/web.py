@@ -297,6 +297,38 @@ class BallotsPage(IcelectView):
             )
 
 
+class ResultsPage(IcelectView):
+    def dispatch_request(self, ident: str):
+        self.init_election(ident)
+
+        if self.election.state != db.ElectionState.results and not g.is_admin:
+            flash('Election results are not available yet.', 'danger')
+            return redirect(self.election_url())
+
+        sess = db.get_session()
+        result = sess.get(db.Result, self.election.election_id)
+        if result is None:
+            raise werkzeug.exceptions.NotFound("Election results not found")
+        json = result.result
+
+        num_votes = sess.scalar(select(func.count()).select_from(db.Ballot).filter_by(election=self.election))
+        num_voters = sess.scalar(select(func.count()).select_from(db.CredHash).filter_by(election=self.election))
+
+        return render_template(
+            'results.html',
+            election=self.election, edata=self.edata,
+            num_votes=num_votes,
+            num_voters=num_voters,
+            condorcet_winner=self.edata.options[json['condorcet_winner'] if json['condorcet_winner'] is not None else None],    # type: ignore
+            weak_condorcet_winners=[self.edata.options[w] for w in json['weak_condorcet_winners']],
+            schulze_winners=[self.edata.options[w] for w in json['schulze_order'][0]],
+            beats=json['beats'],
+            weights=json['weights'],
+            strengths=json['strengths'],
+        )
+
+
+
 class VerifierDownload(IcelectView):
     def dispatch_request(self, ident: str):
         self.init_election(ident)
@@ -367,4 +399,5 @@ app.add_url_rule('/e/<ident>/check', view_func=CheckVotePage.as_view('check_vote
 app.add_url_rule('/e/<ident>/ballots', view_func=BallotsPage.as_view('ballots'))
 app.add_url_rule('/e/<ident>/ballots.csv', view_func=BallotsPage.as_view('ballots_csv'))
 app.add_url_rule('/e/<ident>/verifiers.txt', view_func=VerifierDownload.as_view('verifiers'))
+app.add_url_rule('/e/<ident>/results', view_func=ResultsPage.as_view('results'))
 app.add_url_rule('/e/<ident>/admin/set-state', view_func=SetElectionState.as_view('set_state'))
