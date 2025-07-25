@@ -15,15 +15,15 @@ def gen_credential() -> str:
 
 
 def cred_to_h1(cred: str) -> str:
-    h1bin = hashlib.sha256(cred.encode('us-ascii')).digest()
+    h1bin = hashlib.sha256(('H1:' + cred).encode('us-ascii')).digest()
     h1 = base64.b64encode(h1bin[:18]).decode('us-ascii')
     return h1
 
 
-def h1_to_h2(h1: str) -> str:
-    h2bin = hashlib.sha256(h1.encode('us-ascii')).digest()
-    h2 = base64.b64encode(h2bin[:18]).decode('us-ascii')
-    return h2
+def cred_to_h2(cred: str) -> str:
+    h1bin = hashlib.sha256(('H2:' + cred).encode('us-ascii')).digest()
+    h1 = base64.b64encode(h1bin[:18]).decode('us-ascii')
+    return h1
 
 
 def gen_key() -> str:

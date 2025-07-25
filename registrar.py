@@ -6,7 +6,7 @@ import argparse
 import re
 import sys
 
-from icelect.crypto import gen_credential, cred_to_h1, h1_to_h2, h1_to_verifier
+from icelect.crypto import gen_credential, cred_to_h1, cred_to_h2, h1_to_verifier
 
 
 def cmd_cred(args: argparse.Namespace) -> None:
@@ -19,7 +19,7 @@ def cmd_cred(args: argparse.Namespace) -> None:
                 for cred in creds:
                     print(cred, file=out_cred)
                     h1 = cred_to_h1(cred)
-                    h2 = h1_to_h2(h1)
+                    h2 = cred_to_h2(cred)
                     print(h1, file=out_h1)
                     print(h2, file=out_h2)
 

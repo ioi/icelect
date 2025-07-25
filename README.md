@@ -16,8 +16,8 @@ Parties:
 
   - The registrar generates _credentials_ (random strings of sufficient
     entropy), as many as there are voters.
-  - For each credential, the registrar computes a (cryptographic) hash H1
-    and then hashes it again to produce H2.
+  - For each credential, the registrar computes two independent cryptographic
+    hases H1 and H2.
   - H2 hashes are given to the server operator.
   - H1 hashes are kept by the registrar.
   - The registrar hands out credentials to voters at random.

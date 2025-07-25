@@ -17,7 +17,7 @@ import wtforms
 import wtforms.validators as validators
 
 import icelect.config as config
-from icelect.crypto import cred_to_h1, h1_to_h2, h1_to_receipt, h1_to_verifier
+from icelect.crypto import cred_to_h1, cred_to_h2, h1_to_receipt, h1_to_verifier
 import icelect.db as db
 from icelect.election import ElectionConfig
 
@@ -70,7 +70,7 @@ class IcelectView(View):
         if cred is None:
             return False
         sess = db.get_session()
-        h2 = h1_to_h2(cred_to_h1(cred))
+        h2 = cred_to_h2(cred)
         return sess.scalar(select(db.CredHash).filter_by(election=self.election, hash=h2)) is not None
 
     def election_url(self) -> str:
