@@ -12,7 +12,7 @@ from typing import NoReturn
 from icelect.crypto import gen_key
 import icelect.db as db
 from icelect.election import ElectionConfig, ConfigError
-from icelect.schulze import Schulze
+from icelect.results import Results
 
 
 def die(msg: str) -> NoReturn:
@@ -101,17 +101,15 @@ def cmd_register(args: argparse.Namespace):
     print(f'Processed {len(hashes)} hashes. Registered voters: {count_before} before, {count_after} after.')
 
 
-def cmd_schulze(args: argparse.Namespace):
+def cmd_results(args: argparse.Namespace):
     candidates, ranks = read_csv_ballots(args.input)
 
-    print(candidates)
-    print(ranks)
+    res = Results(len(candidates), ranks)
+    res.debug()
 
-    schulze = Schulze(len(candidates), ranks)
-
-    print(schulze.beats)
-    print(schulze.weights)
-    print(schulze.strengths)
+    print('Order of options:')
+    for layer in res.schulze_order:
+        print([candidates[w] for w in layer])
 
 
 def read_csv_ballots(filename: str) -> tuple[list[str], list[list[int]]]:
@@ -156,11 +154,11 @@ def main() -> None:
     register_parser.add_argument('ident', help='alphanumeric identifier of the election')
     register_parser.set_defaults(handler=cmd_register)
 
-    schulze_parser = subparsers.add_parser('test_schulze',
-                                            help='test implementation of Schulze method',
+    results_parser = subparsers.add_parser('test-results',
+                                            help='test computation of results',
                                             description='Given a list of ballots, compute election outcome using the Schulze method')
-    schulze_parser.add_argument('input', help='CSV file with a list of ballots')
-    schulze_parser.set_defaults(handler=cmd_schulze)
+    results_parser.add_argument('input', help='CSV file with a list of ballots')
+    results_parser.set_defaults(handler=cmd_results)
 
     args = parser.parse_args()
     args.handler(args)
