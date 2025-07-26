@@ -18,3 +18,8 @@ processes = 2
 vacuum = true
 die-on-term = true
 max-requests = 10000
+
+mount = /=icelect.web:app
+plugin = python3
+virtualenv = venv
+manage-script-name = true
