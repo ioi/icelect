@@ -39,12 +39,12 @@
 {% endwith %}
 {% block body %}{% endblock %}
 </main>
-{% if g.role != 'user' %}
 <footer>
+{% if g.role != 'user' %}
 	<form method=POST action='{{ url_for('logout') }}'>
 		<button class='btn btn-outline-danger' type=submit>Log out</button>
 	</form>
-</footer>
 {% endif %}
+</footer>
 </body>
 </html>

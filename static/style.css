@@ -10,7 +10,7 @@ body {
 header {
 	display: block;
 	margin: 0 auto;
-	padding: 0 1em;
+	padding: 2vh 1em;
 	max-width: 1000px;
 	width: 100%;
 }
@@ -51,6 +51,7 @@ footer {
 
 .ballots {
 	border-collapse: collapse;
+	margin-bottom: 2ex;
 }
 
 .ballots TD, .ballots TH {

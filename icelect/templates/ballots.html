@@ -20,7 +20,9 @@
 	{% endfor %}
 </table>
 
-<div class='btn-group mt-4'>
+<p><a href='{{ url_for('ballots_csv', ident=election.ident) }}'>Download as CSV</a>.</p>
+
+<div class='btn-group mt-2'>
 	<a class='btn btn-primary' href='{{ url_for('election', ident=election.ident) }}'>Back to the election</a>
 </div>
 

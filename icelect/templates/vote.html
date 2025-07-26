@@ -23,11 +23,12 @@
 {{ vote_form.credential }}
 <p>
 	FIXME: Explain how voting works and what is the nonce.
+	(Small numbers more preferred than large ones, ties are allowed.)
 </p>
 <p>
 	{{ vote_form.nonce.label }}
 	{{ vote_form.nonce(size=16) }}
-	<button type="button" onclick="recalc_nonce(true)">Generate</button>
+	<button class="btn btn-secondary" type="button" onclick="recalc_nonce(true)">Generate</button>
 </p>
 <table class=vote>
 	<tr>
@@ -44,7 +45,7 @@
 	{% endfor %}
 </table>
 <p>
-	{{ vote_form.send }}
+	{{ vote_form.send(class="btn btn-primary mt-4") }}
 </p>
 </form>
 
