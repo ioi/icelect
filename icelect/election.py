@@ -2,7 +2,6 @@
 # (c) 2025 Martin Mareš <mj@ucw.cz>
 
 import csv
-from dataclasses import dataclass
 from sqlalchemy import select
 import tomllib
 from typing import Any
@@ -33,7 +32,7 @@ class ElectionData:
     @classmethod
     def from_config_file(cls, ident: str) -> 'ElectionData':
         try:
-            with open(f'etc/{ident}.toml', 'rb') as file:
+            with open(f'elections/{ident}.toml', 'rb') as file:
                 config = tomllib.load(file)
         except tomllib.TOMLDecodeError as err:
             raise ConfigError(str(err))
@@ -99,12 +98,3 @@ class ElectionData:
 
     def results(self) -> 'Results':
         return Results(self.num_options, [b.ranks for b in self.ballots])
-
-
-"""
-@dataclass
-class Ballot:
-    receipt: str
-    nonce: str
-    ranks: list[int]
-"""

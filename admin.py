@@ -78,13 +78,13 @@ def cmd_register(args: argparse.Namespace):
 
     hashes = []
     try:
-        with open(f'etc/{args.ident}.h2') as f:
+        with open(f'elections/{args.ident}.h2') as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith('#'):
                     hashes.append(line)
     except FileNotFoundError:
-        die(f'Cannot open etc/{args.ident}.h2')
+        die(f'Cannot open elections/{args.ident}.h2')
 
     count_before = sess.scalar(select(func.count()).select_from(db.CredHash).filter_by(election_id=elect.election_id))
 
@@ -138,19 +138,19 @@ def main() -> None:
 
     create_parser = subparsers.add_parser('create',
                                           help='create a new election',
-                                          description='Create a new election according to a configuration file etc/IDENT.toml')
+                                          description='Create a new election according to a configuration file elections/IDENT.toml')
     create_parser.add_argument('ident', help='alphanumeric identifier of the new election')
     create_parser.set_defaults(handler=cmd_create)
 
     update_parser = subparsers.add_parser('update',
                                           help='update an election',
-                                          description='Update election configuration according to etc/IDENT.toml')
+                                          description='Update election configuration according to elections/IDENT.toml')
     update_parser.add_argument('ident', help='alphanumeric identifier of the election')
     update_parser.set_defaults(handler=cmd_update)
 
     register_parser = subparsers.add_parser('register',
                                             help='register voters',
-                                            description='Register voters to an election according to etc/IDENT.h2')
+                                            description='Register voters to an election according to elections/IDENT.h2')
     register_parser.add_argument('ident', help='alphanumeric identifier of the election')
     register_parser.set_defaults(handler=cmd_register)
 
