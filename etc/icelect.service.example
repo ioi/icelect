@@ -1,0 +1,10 @@
+[Unit]
+Description=uWSGI instance to serve IOI elections
+After=network.target
+
+[Service]
+WorkingDirectory=/home/icelect/icelect
+ExecStart=/usr/bin/uwsgi --ini etc/uwsgi.ini
+
+[Install]
+WantedBy=default.target

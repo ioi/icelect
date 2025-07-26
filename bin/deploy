@@ -1,0 +1,42 @@
+#!/bin/bash
+set -e
+
+DEST=..
+if [ ! -f ../etc/config.py ] ; then
+	echo >&2 "Started from a wrong directory"
+	exit 1
+fi
+
+if [ ! -d $DEST/venv ] ; then
+	echo "Creating venv"
+	python3 -m venv $DEST/venv
+	. $DEST/venv/bin/activate
+	pip install wheel
+else
+	echo "Switching to venv"
+	. $DEST/venv/bin/activate
+fi
+
+echo "Creating directories"
+mkdir -p $DEST/{log,var}
+bin/init-data-dir $DEST/data
+
+echo "Installing packages"
+pip install -c constraints.txt .
+
+for d in $DEST/venv/lib/python*/site-packages/icelect ; do
+	if [ ! -f $d/config.py ] ; then
+		echo "Symlinking config.py do $d/"
+		ln -s ../../../../../etc/config.py $d/
+	fi
+done
+
+echo "Installing static"
+rsync -r --delete static/ $DEST/static/
+
+if [ -e $DEST/var/uwsgi.fifo ] ; then
+	echo "Reloading uwsgi"
+	echo r >$DEST/var/uwsgi.fifo || true
+else
+	echo "Reload not needed, uwsgi is not running"
+fi

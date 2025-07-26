@@ -1,0 +1,20 @@
+[uwsgi]
+strict = true
+chdir = /home/icelect/icelect
+socket = var/osmo.sock
+chmod-socket = 666
+master-fifo = var/uwsgi.fifo
+
+listen = 4096
+
+logto = log/icelect.log
+log-maxsize = 1000000
+log-date = %%Y-%%m-%%d %%H:%%M:%%S
+logformat-strftime
+log-format = %(ftime) %(addr) %(method) "%(uri)" %(proto) %(status) t=%(msecs) rxb=%(cl) txb=%(rsize) pid=%(pid)
+
+master = true
+processes = 2
+vacuum = true
+die-on-term = true
+max-requests = 10000
