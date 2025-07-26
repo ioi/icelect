@@ -2,15 +2,15 @@
 {% set title="IOI Elections" %}
 {% block body %}
 
-{% if e_conf_list %}
+{% if e_data_list %}
 
 <table class='election-list'>
 	<tr>
 		<th>Name
 		<th>State
-	{% for election, econfig in e_conf_list %}
+	{% for election, edata in e_data_list %}
 	<tr>
-		<td><a href='{{ url_for("election", ident=election.ident) }}'>{{ econfig.title }}</a>
+		<td><a href='{{ url_for("election", ident=election.ident) }}'>{{ edata.title }}</a>
 		<td>{{ election.state }}
 	{% endfor %}
 </table>

@@ -85,9 +85,9 @@ class MainPage(IcelectView):
         if not g.is_admin:
             elections = [e for e in elections if e.state != db.ElectionState.init]
 
-        e_conf_list = [(e, ElectionConfig(e.ident, e.config)) for e in elections]
+        e_data_list = [(e, ElectionData.from_db(e)) for e in elections]
 
-        return render_template('index.html', e_conf_list=e_conf_list)
+        return render_template('index.html', e_data_list=e_data_list)
 
 
 class SetStateForm(FlaskForm):
