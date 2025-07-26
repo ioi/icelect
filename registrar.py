@@ -13,9 +13,9 @@ def cmd_cred(args: argparse.Namespace) -> None:
     creds = [gen_credential() for _ in range(args.count)]
     assert len(creds) == len(set(creds))
 
-    with open(args.output + '.cred', 'w') as out_cred:
-        with open(args.output + '.h1', 'w') as out_h1:
-            with open(args.output + '.h2', 'w') as out_h2:
+    with open(f'elections/{args.ident}.cred', 'w') as out_cred:
+        with open(f'elections/{args.ident}.h1', 'w') as out_h1:
+            with open(f'elections/{args.ident}.h2', 'w') as out_h2:
                 for cred in creds:
                     print(cred, file=out_cred)
                     h1 = cred_to_h1(cred)
@@ -25,7 +25,7 @@ def cmd_cred(args: argparse.Namespace) -> None:
 
 
 def cmd_verify(args: argparse.Namespace) -> None:
-    with open(args.name + '.h1') as f:
+    with open(f'elections/{args.ident}.h1') as f:
         h1_list = []
         for line in f:
             line = line.strip()
@@ -75,21 +75,21 @@ def main() -> None:
                                         help='generate voter credentials',
                                         description="""
         Generate voter credentials.
-        Produces: OUTPUT.cred (credentials to distribute to the voters and then discard),
-        OUTPUT.h1 (credential hashes to keep), and
-        OUTPUT.h2 (credential hashes to upload to the election server).
+        Produces: elections/IDENT.cred (credentials to distribute to the voters and then discard),
+        elections/IDENT.h1 (credential hashes to keep), and
+        elections/IDENT.h2 (credential hashes to upload to the election server).
     """)
     cred_parser.add_argument('--count', '-c', type=int, required=True, help="number of voters")
-    cred_parser.add_argument('--output', '-o', required=True, help="base name of generated files")
+    cred_parser.add_argument('--ident', '-i', required=True, help="alphanumeric identifier of the election")
     cred_parser.set_defaults(handler=cmd_cred)
 
     verify_parser = subparsers.add_parser('verify',
                                           help='verify votes cast',
                                           description="""
-        Checks that verifiers downloaded from the election system as NAME.verify
-        match hashes of legitimate voter credentials in NAME.h1.
+        Checks that verifiers downloaded from the election system as elections/NAME.verify
+        match hashes of legitimate voter credentials in elections/NAME.h1.
     """)
-    verify_parser.add_argument('--name', '-n', required=True, help="base name of election files")
+    cred_parser.add_argument('--ident', '-i', required=True, help="alphanumeric identifier of the election")
     verify_parser.set_defaults(handler=cmd_verify)
 
     args = parser.parse_args()
