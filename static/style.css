@@ -71,3 +71,28 @@ footer {
 	writing-mode: vertical-rl;
 	transform: rotate(180deg);
 }
+
+.matrix {
+	border-collapse: collapse;
+	margin-top: 2vh;
+	margin-bottom: 3vh;
+}
+
+.matrix TR:first-child TH {
+	writing-mode: vertical-rl;
+	transform: rotate(180deg);
+	padding-top: 0.4em;
+}
+
+.matrix TR:nth-child(n+2) TH {
+	padding-right: 0.4em;
+}
+
+.matrix TD {
+	border: 1px solid #666666;
+	text-align: center;
+}
+
+.matrix TD.b {
+	background-color: red;
+}

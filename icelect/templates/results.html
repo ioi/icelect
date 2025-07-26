@@ -5,9 +5,16 @@
 
 <h2>Statistics</h2>
 
-<p>There are {{ edata.num_options }} options and {{ num_votes }} votes out of {{ num_voters }} voters.
+<p>There are {{ num_votes }} votes out of {{ num_voters }} voters.
 
 <h2>Condorcet winner</h2>
+
+<p class=small>
+	A strong Condorced winner is the option that beats all other
+	options in pairwise matches. In case of ties, there could be
+	weak Condorced winners that are not beaten by other options,
+	but they can tie with each other.
+</p>
 
 {% if condorcet_winner is not none %}
 <p>There is a strong Condorcet winner: <b>{{ condorcet_winner }}</b>.</p>
@@ -19,6 +26,14 @@
 
 <h2>Schulze method</h2>
 
+<p class=small>
+	It might happen that there is no Condorcet winner, if the beat
+	graph contains cycles. In this case, we use the Schulze method
+	to determine the winner(s). The Schulze winner is an option that
+	is not path-beaten (see below for definition) by any other option.
+	If there are path-ties, there can be multiple Schulze winners.
+</p>
+
 {% if schulze_winners|length == 1 %}
 <p>There is a Schulze winner: <b>{{ schulze_winners[0] }}</b>.</p>
 {% else %}
@@ -28,7 +43,7 @@
 <h2>Details</h2>
 
 {% macro matrix(m) %}
-<table>
+<table class=matrix>
 	<tr>
 		<th>
 		{% for o in edata.options %}
@@ -38,21 +53,41 @@
 	<tr>
 		<th>{{ edata.options[i] }}
 		{% for j in range(edata.num_options) %}
-		<td>{{ m[i][j] }}
+		<td{% if m[i][j] > m[j][i] %} class="b"{% endif %}>{{ m[i][j] }}
 		{% endfor %}
 	{% endfor %}
 </table>
 {% endmacro %}
 
-<h3>Beat counts</h3>
+<h4>Beat counts</h4>
+
+<p class=small>
+	For every pair of candidates A in B, we count the ballots in which
+	A comes before B. We say that A <em>beats</em> B if A is before B often than
+	B before A. We say that A <em>ties</em> with B, both orders are equally frequent.
+	A <em>beat graph</em> has options as vertices and beats as directed edges.
+</p>
 
 {{ matrix(beats) }}
 
-<h3>Beat weights</h3>
+<h4>Beat strengths</h4>
+
+<p class=small>
+	If A beats B, the <em>strength</em> of the beat is the number of ballots
+	with A before B minus the number of those with B before A. It provides
+	costs to edges of the beat graph.
+</p>
 
 {{ matrix(weights) }}
 
-<h3>Path strenghts</h3>
+<h4>Path strengths</h4>
+
+<p class=small>
+	A <em>beat path</em> is a path in the beat graph. The <em>strength</em> of the
+	path is the minimum strength among the path's edges. For each pair of options,
+	we find the strongest path. We say that A <em>path-beats</em> B if the strongest
+	path from A to B is stronger than the strongest path from B to A.
+</p>
 
 {{ matrix(strengths) }}
 
