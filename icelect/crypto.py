@@ -30,12 +30,12 @@ def gen_key() -> str:
     return base64.b64encode(secrets.token_bytes(24)).decode('us-ascii')
 
 
-def h1_to_receipt(h1: str, key: str) -> str:
-    return _sign(h1, key)[:8]
+def h1_to_receipt(h1: str, election_key: str) -> str:
+    return _sign(h1, election_key)[:8]
 
 
-def h1_to_verifier(h1: str, key: str) -> str:
-    return _sign(h1, key)
+def h1_to_verifier(h1: str, verification_key: str) -> str:
+    return _sign(h1, verification_key)
 
 
 def _sign(msg: str, key: str) -> str:
