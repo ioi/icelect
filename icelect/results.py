@@ -38,7 +38,7 @@ class Results:
 
     def calc_beats(self):
         """
-        Compute the beat martix: beats[i,j] tells how many ballots prefer i to j.
+        Compute the beat matrix: beats[i,j] tells how many ballots prefer i to j.
         """
 
         self.beats = np.zeros((self.num_options, self.num_options), dtype='i4')
