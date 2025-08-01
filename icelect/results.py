@@ -30,18 +30,18 @@ class Results:
     def __init__(self, num_options: int, ballots: list[list[int]]):
         self.num_options = num_options
         self.ballots = ballots
-        self.calc_beats()
-        self.calc_condorcet()
-        self.calc_weights()
-        self.calc_strengths()
-        self.calc_winners()
+        self._calc_beats()
+        self._calc_condorcet()
+        self._calc_weights()
+        self._calc_strengths()
+        self._calc_winners()
 
-    def calc_beats(self):
+    def _calc_beats(self):
         """
         Compute the beat matrix: beats[i,j] tells how many ballots prefer i to j.
         """
 
-        self.beats = np.zeros((self.num_options, self.num_options), dtype='i4')
+        self.beats = np.zeros((self.num_options, self.num_options), dtype=np.int32)
 
         for rank in self.ballots:
             assert len(rank) == self.num_options
@@ -50,7 +50,7 @@ class Results:
                     if i != j and rank[i] < rank[j]:
                         self.beats[i,j] += 1
 
-    def calc_condorcet(self):
+    def _calc_condorcet(self):
         """
         Compute the strong Condorcet winner and the set of weak Condorcet winners.
         """
@@ -63,14 +63,14 @@ class Results:
             if all(self.beats[i,j] >= self.beats[j,i] or i == j for j in range(self.num_options)):
                 self.weak_condorcet_winners.append(i)
 
-    def calc_weights(self):
+    def _calc_weights(self):
         """
         Compute beat weights: if i beats j, then weights[i,j] = beats[i,j] - beats[j,i].
         """
 
         self.weights = np.maximum(self.beats - self.beats.T, 0)
 
-    def calc_strengths(self):
+    def _calc_strengths(self):
         """
         Compute path strengths: strengths[i,j] is the maximum strength over all beat paths
         from i to j, where the strength of a path is the minimum weight on its edges.
@@ -88,7 +88,7 @@ class Results:
 
         self.stronger = self.strengths > self.strengths.T
 
-    def calc_winners(self):
+    def _calc_winners(self):
         """
         Compute Schulze layers. The first layer is the winners.
         """
