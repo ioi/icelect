@@ -55,6 +55,7 @@ class ElectionData:
 
     def _parse_config(self, config: Any) -> None:
         try:
+            self.config = config
             root = Walker(config).enter_object()
             self.title = root['title'].as_str()
             options = root['options']
