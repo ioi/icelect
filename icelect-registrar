@@ -89,7 +89,7 @@ def main() -> None:
         Checks that verifiers downloaded from the election system as elections/NAME.verify
         match hashes of legitimate voter credentials in elections/NAME.h1.
     """)
-    cred_parser.add_argument('--ident', '-i', required=True, help="alphanumeric identifier of the election")
+    verify_parser.add_argument('--ident', '-i', required=True, help="alphanumeric identifier of the election")
     verify_parser.set_defaults(handler=cmd_verify)
 
     args = parser.parse_args()
