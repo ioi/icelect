@@ -37,6 +37,10 @@ class Results:
         self.calc_winners()
 
     def calc_beats(self):
+        """
+        Compute the beat martix: beats[i,j] tells how many ballots prefer i to j.
+        """
+
         self.beats = np.zeros((self.num_options, self.num_options), dtype='i4')
 
         for rank in self.ballots:
@@ -47,6 +51,10 @@ class Results:
                         self.beats[i,j] += 1
 
     def calc_condorcet(self):
+        """
+        Compute the strong Condorcet winner and the set of weak Condorcet winners.
+        """
+
         self.condorcet_winner = None
         self.weak_condorcet_winners = []
         for i in range(self.num_options):
@@ -56,9 +64,18 @@ class Results:
                 self.weak_condorcet_winners.append(i)
 
     def calc_weights(self):
+        """
+        Compute beat weights: if i beats j, then weights[i,j] = beats[i,j] - beats[j,i].
+        """
+
         self.weights = np.maximum(self.beats - self.beats.T, 0)
 
     def calc_strengths(self):
+        """
+        Compute path strengths: strengths[i,j] is the maximum strength over all beat paths
+        from i to j, where the strength of a path is the minimum weight on its edges.
+        """
+
         self.strengths = self.weights.copy()
         s = self.strengths
 
@@ -72,6 +89,10 @@ class Results:
         self.stronger = self.strengths > self.strengths.T
 
     def calc_winners(self):
+        """
+        Compute Schulze layers. The first layer is the winners.
+        """
+
         self.schulze_order = []
         remains = set(range(self.num_options))
 
