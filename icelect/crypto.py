@@ -21,9 +21,9 @@ def cred_to_h1(cred: str) -> str:
 
 
 def cred_to_h2(cred: str) -> str:
-    h1bin = hashlib.sha256(('H2:' + cred).encode('us-ascii')).digest()
-    h1 = base64.b64encode(h1bin[:18]).decode('us-ascii')
-    return h1
+    h2bin = hashlib.sha256(('H2:' + cred).encode('us-ascii')).digest()
+    h2 = base64.b64encode(h2bin[:18]).decode('us-ascii')
+    return h2
 
 
 def gen_key() -> str:
