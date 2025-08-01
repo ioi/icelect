@@ -25,7 +25,7 @@ class SchulzeTests(unittest.TestCase):
             ranks += [rank] * count
 
         res = Results(n, ranks)
-        res.debug()
+        # res.debug()
 
         order = [set(options[w] for w in layer) for layer in res.schulze_order]
         self.assertEqual(order, [set(layer) for layer in expected_order])
