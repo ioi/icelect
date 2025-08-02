@@ -131,7 +131,7 @@ class ElectionPage(IcelectView):
 
 class VoteFormBase(FlaskForm):
     credential = wtforms.HiddenField()
-    nonce = wtforms.StringField("Nonce:", [validators.DataRequired(), validators.Length(max=16)])
+    nonce = wtforms.StringField("Nonce (a random string to make your vote unique):", [validators.DataRequired(), validators.Length(max=16)])
     send = wtforms.SubmitField("Send your vote")
 
 
