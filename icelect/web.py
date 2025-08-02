@@ -313,6 +313,7 @@ class ResultsPage(IcelectView):
 
         num_votes = sess.scalar(select(func.count()).select_from(db.Ballot).filter_by(election=self.election))
         num_voters = sess.scalar(select(func.count()).select_from(db.CredHash).filter_by(election=self.election))
+        schulze_order = json['schulze_order']
 
         return render_template(
             'results.html',
@@ -321,7 +322,8 @@ class ResultsPage(IcelectView):
             num_voters=num_voters,
             condorcet_winner=self.edata.options[json['condorcet_winner']] if json['condorcet_winner'] is not None else None,    # type: ignore
             weak_condorcet_winners=[self.edata.options[w] for w in json['weak_condorcet_winners']],
-            schulze_winners=[self.edata.options[w] for w in json['schulze_order'][0]],
+            schulze_winners=[self.edata.options[w] for w in schulze_order[0]],
+            schulze_layers=[[self.edata.options[w] for w in layer] for layer in schulze_order],
             beats=json['beats'],
             weights=json['weights'],
             strengths=json['strengths'],

@@ -40,6 +40,23 @@
 <p>There are multiple Schulze winners: <b>{{ schulze_winners|join(", ") }}</b>.
 {% endif %}
 
+{% if schulze_layers|length > 1 %}
+
+<p class=small>
+	After we remove the winners, we can iterate the Schulze method
+	and obtain the order of other options:
+</p>
+
+<ol>
+	{% for layer in schulze_layers %}
+		{% if not loop.first %}
+		<li>{{ layer|join(", ") }}
+		{% endif %}
+	{% endfor %}
+</ol>
+
+{% endif %}
+
 <h2>Details</h2>
 
 {% macro matrix(m) %}
