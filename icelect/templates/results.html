@@ -3,9 +3,17 @@
 
 {% block body %}
 
-<h2>Statistics</h2>
+<h2>Summary</h2>
 
 <p>There are {{ num_votes }} votes out of {{ num_voters }} voters.
+
+<p style='font-size: x-large'>
+{% if schulze_winners|length == 1 %}
+The winner is: {{ schulze_winners[0] }}.
+{% else %}
+The winners are: {{ schulze_winners|join(", ") }}.
+{% endif %}
+</p>
 
 <h2>Condorcet winner</h2>
 
