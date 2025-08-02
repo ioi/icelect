@@ -319,7 +319,7 @@ class ResultsPage(IcelectView):
             election=self.election, edata=self.edata,
             num_votes=num_votes,
             num_voters=num_voters,
-            condorcet_winner=self.edata.options[json['condorcet_winner'] if json['condorcet_winner'] is not None else None],    # type: ignore
+            condorcet_winner=self.edata.options[json['condorcet_winner']] if json['condorcet_winner'] is not None else None,    # type: ignore
             weak_condorcet_winners=[self.edata.options[w] for w in json['weak_condorcet_winners']],
             schulze_winners=[self.edata.options[w] for w in json['schulze_order'][0]],
             beats=json['beats'],
