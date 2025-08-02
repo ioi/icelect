@@ -23,7 +23,7 @@
 {{ vote_form.credential }}
 <p>
 	Please rank each option where rank 1 is the most preferred
-	and rank {{ vote_rows[0][1]|length }} is the least preferred.
+	and rank {{ vote_rows|length }} is the least preferred.
 	Note that you can also give the same rank to multiple options.
 </p>
 <table class=vote>
@@ -40,13 +40,13 @@
 		{% endfor %}
 	{% endfor %}
 </table>
-<p>
+<p class="mt-4">
 	{{ vote_form.nonce.label }}
 	{{ vote_form.nonce(size=16) }}
 	<button class="btn btn-secondary" type="button" onclick="recalc_nonce(true)">Generate</button>
 </p>
 <p>
-	{{ vote_form.send(class="btn btn-primary mt-4") }}
+	{{ vote_form.send(class="btn btn-primary mt-2") }}
 </p>
 </form>
 
