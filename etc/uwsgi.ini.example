@@ -1,7 +1,7 @@
 [uwsgi]
 strict = true
 chdir = /home/icelect/icelect
-socket = var/osmo.sock
+socket = var/icelect.sock
 chmod-socket = 666
 master-fifo = var/uwsgi.fifo
 
