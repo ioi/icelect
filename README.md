@@ -1,6 +1,6 @@
-# IOI Committee Election
+# Icelect -- an Election System for the IOI
 
-(c) 2025 Martin Mareš <mj@ucw.cz>
+(c) 2025-2026 Martin Mareš <mj@ucw.cz>
 
 Placed under the MIT License.
 
@@ -119,3 +119,8 @@ Notable side-channels:
   - Cookies: the server must be placed in an unrelated domain to avoid leaking
     cookies from other sites in the same domain, which could leak information
     on voters' identity.
+
+### Name
+
+"Icelect" is both an abbreviation of "IOI Commmitee Election" and a pun on
+"I select".
