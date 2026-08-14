@@ -58,7 +58,7 @@
 </table>
 <p class="mt-4">
 	{{ vote_form.nonce.label }}
-	{{ vote_form.nonce(size=16) }}
+	{{ vote_form.nonce(size=16, readonly=True) }}
 	<button class="btn btn-secondary" type="button" onclick="recalc_nonce(true)">Generate</button>
 </p>
 <p>
