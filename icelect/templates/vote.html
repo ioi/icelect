@@ -15,7 +15,23 @@
 		}
 	}
 
+	function tweak_form() {
+		const tableEl = document.querySelector('.vote');
+		const headerCells = [...tableEl.querySelectorAll('th')].slice(1);
+		const rowsInputs = [...tableEl.querySelectorAll('tr')].slice(1).map(rowEl => [...rowEl.querySelectorAll(':scope > td input[type="radio"]')]);
+		const rowsValues = () => rowsInputs.map(rowInputs => rowInputs.map(el => el.checked));
+		const updateHeaderPoints = function() {
+			const values = rowsValues();
+			const usedColumns = [...values[0]].map((undefined, i) => values.some(row => row[i]));
+			let count = 0;
+			headerCells.forEach((el, i) => el.textContent = usedColumns[i] ?  ++count : '');
+		};
+		if (!rowsValues().every(el => el[0])) updateHeaderPoints();
+		rowsInputs.flat().forEach(el => el.addEventListener('change', updateHeaderPoints));
+	}
+
 	window.addEventListener("load", (event) => { recalc_nonce(false) });
+	window.addEventListener("load", (event) => { tweak_form() });
 </script>
 
 <form method="POST">
