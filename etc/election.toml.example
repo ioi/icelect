@@ -1,0 +1,11 @@
+# Example election config
+
+title = "Test Election"
+
+options = [
+	"Alpha",
+	"Beta",
+	"Gamma",
+	"Delta",
+	"Epsilon",
+]
