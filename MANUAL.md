@@ -2,10 +2,11 @@
 
 ## Installation
 
+First create a configuration file in `lib/config.py` based on `etc/config.py.example`.
+In particular, you should the login credentials for the administrator and the
+registrar.
+
 Create a Python virtual environment, activate it and do `pip install -c constraints.txt .`.
-Copy `etc/config.py.example` to `venv/lib/$PYTHON_VERSION/site-packages/icelect/config.py`
-and edit it as necessary. In particular, you should the login credentials for the
-administrator and the registrar.
 
 An example systemd service file that runs the application using gunicorn
 is in `etc/icelect.service.example`.
