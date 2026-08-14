@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from io import StringIO
 import os
+import re
 from sqlalchemy import select, func
 from sqlalchemy.dialects.postgresql import insert
 import werkzeug.exceptions
@@ -133,6 +134,11 @@ class VoteFormBase(FlaskForm):
     credential = wtforms.HiddenField()
     nonce = wtforms.StringField("Nonce (a random string to make your vote unique):", [validators.DataRequired(), validators.Length(max=16)])
     send = wtforms.SubmitField("Send your vote")
+
+    def validate_nonce(form: FlaskForm, field: wtforms.StringField) -> None:
+        nonce = field.data
+        if nonce is not None and not re.fullmatch(r'[!-~]+', nonce):
+            raise wtforms.ValidationError('The nonce may contain only printable non-blank ASCII characters')
 
 
 class VotePage(IcelectView):
