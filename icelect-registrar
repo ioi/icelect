@@ -58,7 +58,8 @@ def cmd_verify(args: argparse.Namespace) -> None:
             count_bad += 1
             print(f'Verifier {ver} does not correspond to a valid credential.', file=sys.stderr)
 
-    print(f'Found {count_ok} correct verifiers (out of {len(allowed_verifiers)} registered voters) and {count_bad} bad ones.')
+    print(f'Found {count_ok} correct unique verifiers (out of {len(allowed_verifiers)} registered voters) and {count_bad} bad ones.')
+    print('Please make sure that the number of verifiers received matches the number of votes cast.')
 
     if count_bad > 0:
         sys.exit(1)

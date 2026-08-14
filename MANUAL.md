@@ -38,6 +38,7 @@ Each alection is in one of these states:
 5. voters vote using their credentials
 6. voters can check their ballots using their receipts and nonces
 7. set election state to `counting`
-8. the registrar downloads verifiers from the web interface, puts them to `elections/$ELECTION.verify` and runs `icelect-registrar verify --ident $ELECTION`
+8. the registrar downloads verifiers from the web interface, puts them to `elections/$ELECTION.verify` and runs `icelect-registrar verify --ident $ELECTION`;
+   then they check the the number of unique verifiers reported matches the number of votes cast
 9. compute the results by `icelect-admin results $ELECTION` and check them in the web interface
 10. set election state to `results` to publish the results
