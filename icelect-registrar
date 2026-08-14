@@ -32,7 +32,7 @@ def cmd_verify(args: argparse.Namespace) -> None:
             if line and not line.startswith('#'):
                 h1_list.append(line)
 
-    with open(args.name + '.verify') as f:
+    with open(f'elections/{args.ident}.verify') as f:
         verifiers = set()
         verify_key = None
         for line in f:
