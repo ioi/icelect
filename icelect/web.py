@@ -299,7 +299,7 @@ class BallotsPage(IcelectView):
             return render_template(
                 'ballots.html',
                 election=self.election, edata=self.edata,
-                ballots=ballots,
+                ballots=list(ballots),
             )
 
 
